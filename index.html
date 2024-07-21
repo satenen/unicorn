@@ -1,145 +1,129 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicorn Rainbow Chase</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        #gameContainer {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Unicorn Rainbow Chase&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>canvas {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 1px solid black;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#gameContainer {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="gameContainer"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;canvas id="gameCanvas" width="800" height="400"&gt;&lt;/canvas&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Use arrow keys to move the unicorn&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;p&gt;Rainbows: &lt;span id="rainbowCount"&gt;0&lt;/span&gt;/20 | Coins: &lt;span id="coinCount"&gt;0&lt;/span&gt;/5&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const canvas = document.getElementById('gameCanvas');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const ctx = canvas.getContext('2d');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const rainbowCountEl = document.getElementById('rainbowCount');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const coinCountEl = document.getElementById('coinCount');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>let unicorn = { x: 50, y: 200, width: 50, height: 50, speed: 5 };</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let rainbows = [];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let rainbowCount = 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let coinCount = 0;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let gameOver = false;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function drawUnicorn() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fillStyle = 'pink';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fillRect(unicorn.x, unicorn.y, unicorn.width, unicorn.height);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function drawRainbow(rainbow) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fillStyle = 'rainbow';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.beginPath();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.arc(rainbow.x, rainbow.y, rainbow.radius, 0, Math.PI * 2);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.fill();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function createRainbow() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>rainbows.push({</p>
-<p class="p1"><span class="Apple-converted-space">                </span>x: canvas.width,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>y: Math.random() * (canvas.height - 20),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>radius: 10,</p>
-<p class="p1"><span class="Apple-converted-space">                </span>speed: Math.random() * 2 + 1</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function moveUnicorn(e) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (gameOver) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>switch(e.key) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'ArrowUp':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>unicorn.y = Math.max(0, unicorn.y - unicorn.speed);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'ArrowDown':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>unicorn.y = Math.min(canvas.height - unicorn.height, unicorn.y + unicorn.speed);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'ArrowLeft':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>unicorn.x = Math.max(0, unicorn.x - unicorn.speed);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'ArrowRight':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>unicorn.x = Math.min(canvas.width - unicorn.width, unicorn.x + unicorn.speed);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function checkCollision(rainbow) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return unicorn.x &lt; rainbow.x + rainbow.radius &amp;&amp;</p>
-<p class="p1"><span class="Apple-converted-space">                   </span>unicorn.x + unicorn.width &gt; rainbow.x - rainbow.radius &amp;&amp;</p>
-<p class="p1"><span class="Apple-converted-space">                   </span>unicorn.y &lt; rainbow.y + rainbow.radius &amp;&amp;</p>
-<p class="p1"><span class="Apple-converted-space">                   </span>unicorn.y + unicorn.height &gt; rainbow.y - rainbow.radius;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateGame() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (gameOver) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>ctx.clearRect(0, 0, canvas.width, canvas.height);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>drawUnicorn();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>rainbows.forEach((rainbow, index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>rainbow.x -= rainbow.speed;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>drawRainbow(rainbow);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (checkCollision(rainbow)) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>rainbows.splice(index, 1);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>rainbowCount++;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (rainbowCount % 20 === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>coinCount++;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (coinCount &gt;= 5) {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>gameOver = true;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (rainbow.x + rainbow.radius &lt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>rainbows.splice(index, 1);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (Math.random() &lt; 0.02) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>createRainbow();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>rainbowCountEl.textContent = rainbowCount % 20;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>coinCountEl.textContent = coinCount;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (gameOver) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillStyle = 'black';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.font = '48px Arial';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ctx.fillText('WINNER!', canvas.width / 2 - 80, canvas.height / 2);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>requestAnimationFrame(updateGame);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('keydown', moveUnicorn);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>updateGame();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <p>Use arrow keys to move the unicorn</p>
+        <p>Rainbows: <span id="rainbowCount">0</span>/20 | Coins: <span id="coinCount">0</span>/5</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const rainbowCountEl = document.getElementById('rainbowCount');
+        const coinCountEl = document.getElementById('coinCount');
+
+        let unicorn = { x: 50, y: 200, width: 50, height: 50, speed: 5 };
+        let rainbows = [];
+        let rainbowCount = 0;
+        let coinCount = 0;
+        let gameOver = false;
+
+        function drawUnicorn() {
+            ctx.fillStyle = 'pink';
+            ctx.fillRect(unicorn.x, unicorn.y, unicorn.width, unicorn.height);
+        }
+
+        function drawRainbow(rainbow) {
+            ctx.fillStyle = 'rainbow';
+            ctx.beginPath();
+            ctx.arc(rainbow.x, rainbow.y, rainbow.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function createRainbow() {
+            rainbows.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 20),
+                radius: 10,
+                speed: Math.random() * 2 + 1
+            });
+        }
+
+        function moveUnicorn(e) {
+            if (gameOver) return;
+
+            switch(e.key) {
+                case 'ArrowUp':
+                    unicorn.y = Math.max(0, unicorn.y - unicorn.speed);
+                    break;
+                case 'ArrowDown':
+                    unicorn.y = Math.min(canvas.height - unicorn.height, unicorn.y + unicorn.speed);
+                    break;
+                case 'ArrowLeft':
+                    unicorn.x = Math.max(0, unicorn.x - unicorn.speed);
+                    break;
+                case 'ArrowRight':
+                    unicorn.x = Math.min(canvas.width - unicorn.width, unicorn.x + unicorn.speed);
+                    break;
+            }
+        }
+
+        function checkCollision(rainbow) {
+            return unicorn.x < rainbow.x + rainbow.radius &&
+                   unicorn.x + unicorn.width > rainbow.x - rainbow.radius &&
+                   unicorn.y < rainbow.y + rainbow.radius &&
+                   unicorn.y + unicorn.height > rainbow.y - rainbow.radius;
+        }
+
+        function updateGame() {
+            if (gameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawUnicorn();
+
+            rainbows.forEach((rainbow, index) => {
+                rainbow.x -= rainbow.speed;
+                drawRainbow(rainbow);
+
+                if (checkCollision(rainbow)) {
+                    rainbows.splice(index, 1);
+                    rainbowCount++;
+                    if (rainbowCount % 20 === 0) {
+                        coinCount++;
+                        if (coinCount >= 5) {
+                            gameOver = true;
+                        }
+                    }
+                }
+
+                if (rainbow.x + rainbow.radius < 0) {
+                    rainbows.splice(index, 1);
+                }
+            });
+
+            if (Math.random() < 0.02) {
+                createRainbow();
+            }
+
+            rainbowCountEl.textContent = rainbowCount % 20;
+            coinCountEl.textContent = coinCount;
+
+            if (gameOver) {
+                ctx.fillStyle = 'black';
+                ctx.font = '48px Arial';
+                ctx.fillText('WINNER!', canvas.width / 2 - 80, canvas.height / 2);
+            } else {
+                requestAnimationFrame(updateGame);
+            }
+        }
+
+        document.addEventListener('keydown', moveUnicorn);
+        updateGame();
+    </script>
 </body>
 </html>
