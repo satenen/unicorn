@@ -5,72 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unicorn Rainbow Chase</title>
     <style>
-        canvas { border: 1px solid black; }
+        canvas {
+            border: 1px solid black;
+        }
+        #gameInfo {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="800" height="400"></canvas>
-    <p>Use arrow keys to move the unicorn</p>
-    <p>Rainbows: <span id="rainbowCount">0</span>/20 | Coins: <span id="coinCount">0</span>/5</p>
-
+    <div id="gameInfo">Press SPACE to start. Use UP and DOWN arrow keys to move the unicorn.</div>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const rainbowCountEl = document.getElementById('rainbowCount');
-        const coinCountEl = document.getElementById('coinCount');
+        const gameInfo = document.getElementById('gameInfo');
 
-        let unicorn = { x: 50, y: 200, width: 50, height: 50, speed: 5 };
+        let unicorn = { x: 50, y: 200, width: 100, height: 80, speed: 2 };
         let rainbows = [];
-        let rainbowCount = 0;
-        let coinCount = 0;
+        let rainbowsCaught = 0;
+        let gameStarted = false;
+
+        const unicornImage = new Image();
+        unicornImage.src = 'unicorn.png'; // Ensure this matches your unicorn image file name
+
+        const rainbowImage = new Image();
+        rainbowImage.src = 'rainbow.png'; // Ensure this matches your rainbow image file name
 
         function drawUnicorn() {
-            ctx.fillStyle = 'pink';
-            ctx.fillRect(unicorn.x, unicorn.y, unicorn.width, unicorn.height);
+            ctx.drawImage(unicornImage, unicorn.x, unicorn.y, unicorn.width, unicorn.height);
         }
 
         function drawRainbow(rainbow) {
-            ctx.fillStyle = 'blue'; // Changed to blue for visibility
-            ctx.beginPath();
-            ctx.arc(rainbow.x, rainbow.y, rainbow.radius, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.drawImage(rainbowImage, rainbow.x, rainbow.y, rainbow.width, rainbow.height);
         }
 
         function createRainbow() {
             rainbows.push({
                 x: canvas.width,
-                y: Math.random() * (canvas.height - 20),
-                radius: 10,
-                speed: 2
+                y: Math.random() * (canvas.height - 60),
+                width: 80,
+                height: 60,
+                speed: Math.random() * 2 + 1
             });
         }
 
         function moveUnicorn(e) {
-            switch(e.key) {
-                case 'ArrowUp':
-                    unicorn.y = Math.max(0, unicorn.y - unicorn.speed);
-                    break;
-                case 'ArrowDown':
-                    unicorn.y = Math.min(canvas.height - unicorn.height, unicorn.y + unicorn.speed);
-                    break;
-                case 'ArrowLeft':
-                    unicorn.x = Math.max(0, unicorn.x - unicorn.speed);
-                    break;
-                case 'ArrowRight':
-                    unicorn.x = Math.min(canvas.width - unicorn.width, unicorn.x + unicorn.speed);
-                    break;
+            if (!gameStarted) return;
+
+            if (e.key === 'ArrowUp') {
+                unicorn.y = Math.max(0, unicorn.y - 10);
+            } else if (e.key === 'ArrowDown') {
+                unicorn.y = Math.min(canvas.height - unicorn.height, unicorn.y + 10);
             }
         }
 
         function checkCollision(rainbow) {
-            return unicorn.x < rainbow.x + rainbow.radius &&
-                   unicorn.x + unicorn.width > rainbow.x - rainbow.radius &&
-                   unicorn.y < rainbow.y + rainbow.radius &&
-                   unicorn.y + unicorn.height > rainbow.y - rainbow.radius;
+            return unicorn.x < rainbow.x + rainbow.width &&
+                   unicorn.x + unicorn.width > rainbow.x &&
+                   unicorn.y < rainbow.y + rainbow.height &&
+                   unicorn.y + unicorn.height > rainbow.y;
         }
 
         function updateGame() {
+            if (!gameStarted) return;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            unicorn.x += unicorn.speed;
+            if (unicorn.x > canvas.width) {
+                unicorn.x = -unicorn.width;
+            }
 
             drawUnicorn();
 
@@ -80,13 +87,15 @@
 
                 if (checkCollision(rainbow)) {
                     rainbows.splice(index, 1);
-                    rainbowCount++;
-                    if (rainbowCount % 20 === 0) {
-                        coinCount++;
+                    rainbowsCaught++;
+                    if (rainbowsCaught === 4) {
+                        gameInfo.textContent = "Well done!";
+                        gameStarted = false;
+                        return;
                     }
                 }
 
-                if (rainbow.x + rainbow.radius < 0) {
+                if (rainbow.x + rainbow.width < 0) {
                     rainbows.splice(index, 1);
                 }
             });
@@ -95,20 +104,39 @@
                 createRainbow();
             }
 
-            rainbowCountEl.textContent = rainbowCount % 20;
-            coinCountEl.textContent = coinCount;
+            requestAnimationFrame(updateGame);
+        }
 
-            if (coinCount >= 5) {
-                ctx.fillStyle = 'black';
-                ctx.font = '48px Arial';
-                ctx.fillText('WINNER!', canvas.width / 2 - 80, canvas.height / 2);
-            } else {
-                requestAnimationFrame(updateGame);
+        function startGame() {
+            if (!gameStarted) {
+                gameStarted = true;
+                rainbowsCaught = 0;
+                gameInfo.textContent = "Starting game...";
+                setTimeout(() => {
+                    gameInfo.textContent = "Catch 4 rainbows!";
+                    requestAnimationFrame(updateGame);
+                }, 1000);
             }
         }
 
-        document.addEventListener('keydown', moveUnicorn);
-        updateGame();
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                startGame();
+            } else {
+                moveUnicorn(e);
+            }
+        });
+
+        // Wait for both images to load before starting
+        let imagesLoaded = 0;
+        function onImageLoad() {
+            imagesLoaded++;
+            if (imagesLoaded === 2) {
+                drawUnicorn(); // Initial draw once both images are loaded
+            }
+        }
+        unicornImage.onload = onImageLoad;
+        rainbowImage.onload = onImageLoad;
     </script>
 </body>
 </html>
